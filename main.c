@@ -3,9 +3,7 @@
 #include <windows.h>
 #include <time.h>
 
-#define N 10
-
-void cstencil(int n, double* X, double* Y) {
+void static cstencil(int n, double* X, double* Y) {
 	for (int i = 3; i < n - 3; i++) {
 		Y[i] = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2] + X[i + 3];
 	}
@@ -22,9 +20,9 @@ int main() {
 	clock_t cstart, cend;
 	double ctime;
 
-	int size[] = { 1 << 20, 1 << 24, 1 << 29 };
+	int size[] = {1 << 20, 1 << 24, 1 << 29};
 	int compute = sizeof(size) / sizeof(size[0]);
-	int sizes[] = { 20, 24, 29 };
+	int sizes[] = {20, 24, 29};
 
 	srand(time(NULL));
 	double* X = (double*)malloc(size[compute - 1] * sizeof(double));
@@ -33,7 +31,7 @@ int main() {
 	}
 
 	printf("\nGenerating random values: ");
-	for (i = 0; i < N; i++) {
+	for (i = 0; i < 10; i++) {
 		printf("%.2lf, ", X[i]);
 	}
 	printf("\n\n");
@@ -41,7 +39,6 @@ int main() {
 	for (int j = 0; j < compute; j++) {
 		int n = size[j];
 		double* Y = (double*)malloc(n * sizeof(double));
-
 		printf("Vector of size n: 2^%d", sizes[j]);
 		for (i = 0; i < n; i++) {
 			Y[i] = 0.0;
@@ -53,7 +50,7 @@ int main() {
 		ctime = executedtime(cstart, cend);
 
 		printf("\n(C) Y Output: ");
-		for (i = 3; i < N + 3 && i < n; i++) {
+		for (i = 3; i < 10 + 3 && i < n; i++) {
 			printf("%.2lf, ", Y[i]);
 		}
 		for (i = 0; i < n; i++) {
@@ -67,7 +64,7 @@ int main() {
 		ctime = executedtime(cstart, cend);
 
 		printf("(X86-64) Y Output: ");
-		for (i = 0; i < N && i < n; i++) {
+		for (i = 0; i < 10 && i < n; i++) {
 			printf("%.2lf, ", Y[i]);
 		}
 		printf("\n(X86-64) Execution time of vector size %d in seconds: %lf\n\n", n, ctime);
