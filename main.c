@@ -5,13 +5,13 @@
 
 #define N 10
 
-void stencil_c(int n, double* X, double* Y) {
+void cstencil(int n, double* X, double* Y) {
 	for (int i = 3; i < n - 3; i++) {
 		Y[i] = X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2] + X[i + 3];
 	}
 }
 
-extern void stencil_asm(int n, double* X, double* Y);
+extern void asmstencil(int n, double* X, double* Y);
 
 double executedtime(clock_t start, clock_t end) {
 	return ((double)(end - start)) / CLOCKS_PER_SEC;
@@ -22,9 +22,9 @@ int main() {
 	clock_t cstart, cend;
 	double ctime;
 
-	int size[] = { 1 << 20, 1 << 24, 1 << 28 };
+	int size[] = { 1 << 20, 1 << 24, 1 << 29 };
 	int compute = sizeof(size) / sizeof(size[0]);
-	int sizes[] = { 20, 24, 28 };
+	int sizes[] = { 20, 24, 29 };
 
 	srand(time(NULL));
 	double* X = (double*)malloc(size[compute - 1] * sizeof(double));
@@ -32,7 +32,7 @@ int main() {
 		X[i] = (double)(rand() % 100);
 	}
 
-	printf("\nRandom values: ");
+	printf("\nGenerating random values: ");
 	for (i = 0; i < N; i++) {
 		printf("%.2lf, ", X[i]);
 	}
@@ -42,13 +42,13 @@ int main() {
 		int n = size[j];
 		double* Y = (double*)malloc(n * sizeof(double));
 
-		printf("Vector of size n = 2^%d", sizes[j]);
+		printf("Vector of size n: 2^%d", sizes[j]);
 		for (i = 0; i < n; i++) {
 			Y[i] = 0.0;
 		}
 
 		cstart = clock();
-		stencil_c(n, X, Y);
+		cstencil(n, X, Y);
 		cend = clock();
 		ctime = executedtime(cstart, cend);
 
@@ -59,14 +59,18 @@ int main() {
 		for (i = 0; i < n; i++) {
 			Y[i] = 0.0;
 		}
-		printf("\n(C) Execution time for vector of size %d in seconds: %lf\n", n, ctime);
+		printf("\n(C) Execution time of vector size %d in seconds: %lf\n", n, ctime);
 
 		cstart = clock();
-		stencil_asm(n, X, Y);
+		asmstencil(n, X, Y);
 		cend = clock();
 		ctime = executedtime(cstart, cend);
 
-		printf("(X86-64) Execution time for vector of size %d in seconds: %lf\n\n", n, ctime);
+		printf("(X86-64) Y Output: ");
+		for (i = 0; i < N && i < n; i++) {
+			printf("%.2lf, ", Y[i]);
+		}
+		printf("\n(X86-64) Execution time of vector size %d in seconds: %lf\n\n", n, ctime);
 		free(Y);
 	}
 	free(X);
